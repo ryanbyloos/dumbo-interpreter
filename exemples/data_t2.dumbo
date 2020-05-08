@@ -1,0 +1,4 @@
+{{
+nom := 'Mes plus belles vacances';
+listephoto := ('Mon beau bateau.png', 'Belle maman.png', 'Apero.png', 'Coucher de soleil.png');
+}}

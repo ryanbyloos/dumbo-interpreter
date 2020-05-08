@@ -1,0 +1,16 @@
+<html>
+   <head><title>{{ print nom; }}</title></head>
+   <body>
+      <h1>{{ print nom; }}</h1>
+      {{
+         i := 0;
+         for nom in listephoto do
+           print '<a href ="'.nom.'">'.nom.'</a>';
+           i := i + 1;
+         endfor;
+      }}
+   <br />
+   <br />
+   Il y a {{ print i; }} photos dans l album "{{ print nom; }}".
+   </body>
+</html>

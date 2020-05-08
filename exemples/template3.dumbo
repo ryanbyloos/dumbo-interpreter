@@ -1,0 +1,5 @@
+{{
+a := 'ok';
+if 1 > 2 do a := 'aie aie aie'; endif;
+print a;
+}}
