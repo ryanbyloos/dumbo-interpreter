@@ -46,8 +46,9 @@ dumbo_grammar = Lark(
     var: int | variable
     cmp: gt | lt | eq | neq
     bool_exp: or | and
-
-    bool: "true" | "false" | bool_exp | var cmp var
+    true : "true"
+    false: "false"
+    bool: true | false | bool_exp | var cmp var
 
     or: "(" bool "or" bool ")"
     and: "(" bool "and" bool ")"
@@ -77,7 +78,7 @@ def interprete(root, output_file):
         elif(root.children[0].data == "for_loop"):
             for_loop(root.children[0], output_file)
         elif(root.children[0].data == "if_exp"):
-            if_exp(root.children[0])
+            if_exp(root.children[0], output_file)
 
 
 def txt(tree, output_file):
@@ -170,17 +171,54 @@ def for_loop(root, output_file):
         mapping.pop(Key)
 
 
-def if_exp(root):
-    pass
+def if_exp(root, output_file):
+    if(boolean(root.children[0])):
+        interprete(root.children[1], output_file)
+
+def boolean(root):
+    if(root.children[0].data == "bool_exp"):
+        if(root.children[0].children[0].data == "or"):
+            return or_execute(root.children[0].children[0])
+        elif(root.children[0].children[0].data == "and"):
+            return and_execute(root.children[0].children[0])
+    elif(root.children[0].data == "var"):
+        comp = root.children[1].data
+        if(comp == "eq"):
+            return var(root.children[0]) == var(root.children[2])
+        elif(comp == "neq"):
+            return var(root.children[0]) != var(root.children[2])
+        elif(comp == "gt"):
+            return var(root.children[0]) > var(root.children[2])
+        elif(comp == "lt"):
+            return var(root.children[0]) < var(root.children[2])
+    elif(root.children[0].data == "true"):
+        return True
+    elif(root.childre[0].data == "false"):
+        return False
+
+def or_execute(root):
+    return boolean(root.children[0]) or boolean(root.children[1])
+
+def and_execute(root):
+    return boolean(root.children[0]) and boolean(root.children[1])
+    
+def var(root):
+    if(root.children[0] == "int"):
+        return int(root.children[0].children[0])
+    elif(root.children[0] == "variable"):
+        return int(variable_value(root.children[0]))
 
 
 if __name__ == "__main__":
-    with open("exemples/data_t2.dumbo", "r") as variables:
+    with open("exemples/data_t3.dumbo", "r") as variables:
         if (variables != None):
             tree_data = dumbo_grammar.parse(variables.read())
-    with open("exemples/template2.dumbo", "r") as templates:
+    with open("exemples/template3.dumbo", "r") as templates:
         if (templates != None):
             tree_template = dumbo_grammar.parse(templates.read())
     interprete(tree_data, None)
     with open("exemples/output.html", "w") as output:
         interprete(tree_template, output)
+    
+
+    
