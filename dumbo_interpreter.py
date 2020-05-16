@@ -1,5 +1,6 @@
 from lark import Lark
 from lark import Transformer
+
 import sys
 mapping = {}
 dumbo_grammar = Lark(
@@ -58,18 +59,18 @@ dumbo_grammar = Lark(
     """, start="programme")
 
 
-def interprete(root, output_file):
+def interpret(root, output_file):
     if(root.data == "programme"):
         for element in root.children:
-            interprete(element, output_file)
+            interpret(element, output_file)
     elif(root.data == "txt"):
         txt(root, output_file)
     elif(root.data == "dumbo_bloc"):
         for element in root.children:
-            interprete(element, output_file)
+            interpret(element, output_file)
     elif(root.data == "expression_list"):
         for element in root.children:
-            interprete(element, output_file)
+            interpret(element, output_file)
     elif(root.data == "expression"):
         if(root.children[0].data == "string_expression"):
             output_file.write(string_expression(root.children[0], output_file))
@@ -164,7 +165,7 @@ def for_loop(root, output_file):
         liste = mapping[root.children[1].children[0]]
     for element in liste:
         mapping[Key] = element
-        interprete(root.children[2], output_file)
+        interpret(root.children[2], output_file)
     if(Temp != None):
         mapping[Key] = Temp
     else:
@@ -173,7 +174,7 @@ def for_loop(root, output_file):
 
 def if_exp(root, output_file):
     if(boolean(root.children[0])):
-        interprete(root.children[1], output_file)
+        interpret(root.children[1], output_file)
 
 def boolean(root):
     if(root.children[0].data == "bool_exp"):
@@ -210,15 +211,18 @@ def var(root):
 
 
 if __name__ == "__main__":
-    with open("exemples/data_t3.dumbo", "r") as variables:
-        if (variables != None):
-            tree_data = dumbo_grammar.parse(variables.read())
-    with open("exemples/template3.dumbo", "r") as templates:
-        if (templates != None):
-            tree_template = dumbo_grammar.parse(templates.read())
-    interprete(tree_data, None)
-    with open("exemples/output.html", "w") as output:
-        interprete(tree_template, output)
-    
+    import sys
+    if len(sys.argv) != 4:
+        print("Error, invalid input: Expected 3 arguments")
+    else:
+        data_file, template_file, output_file = sys.argv[1], sys.argv[2], sys.argv[3]
 
-    
+        with open(data_file, 'r') as data:
+            if data != None:
+                data_tree = dumbo_grammar.parse(data.read())
+        with open(template_file, 'r') as template:
+            if template != None:
+                template_tree = dumbo_grammar.parse(template.read())
+        interpret(data_tree, None)
+        with open(output_file, 'w') as output:
+            interpret(template_tree, output)
